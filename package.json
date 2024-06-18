@@ -1,0 +1,17 @@
+{
+  "name": "huskts",
+  "module": "index.ts",
+  "type": "module",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "discord.js": "^14.15.3",
+    "mongoose": "^8.4.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.4",
+    "@types/mongoose": "^5.11.97"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
