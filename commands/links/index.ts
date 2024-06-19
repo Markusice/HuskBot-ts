@@ -37,6 +37,11 @@ export default createCommand({
             .setName("page")
             .setDescription("Number of the page")
             .setMinValue(1),
+        )
+        .addBooleanOption((option) =>
+          option
+            .setName("is_global")
+            .setDescription("Is message seeable to everyone"),
         ),
     )
     .addSubcommand((subcommand) =>
