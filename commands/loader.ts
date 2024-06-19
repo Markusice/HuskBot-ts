@@ -21,6 +21,7 @@ export const loadCommands = async (client: MyClient) => {
         console.log(
           chalk.yellow(`[WARNING] The ${file} doesn't have an index.ts file.`),
         );
+        console.error(error);
       }
     }),
   );
