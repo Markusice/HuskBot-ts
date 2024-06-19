@@ -3,7 +3,12 @@ import {
   ButtonBuilder,
   EmbedBuilder,
 } from "@discordjs/builders";
-import { ButtonInteraction, ButtonStyle, ComponentType } from "discord.js";
+import {
+  ButtonInteraction,
+  ButtonStyle,
+  ComponentType,
+  type CacheType,
+} from "discord.js";
 import { Link } from "../../../schemas/link";
 import type { CommandExecute } from "../../clientCommand";
 
@@ -66,19 +71,19 @@ export const showLink: CommandExecute = async (interaction) => {
     .setLabel(displayButtonCustomID(ButtonCustomID.NextPage))
     .setStyle(ButtonStyle.Primary);
 
-  const embedButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+  const messageButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(
     previousPageButton,
     nextPageButton,
   );
 
-  setNextButtonDisabled(nextPageButton, currentPageEnd, guildLinks);
+  setNextButtonDisabledState(nextPageButton, currentPageEnd, guildLinks);
 
   const response = await interaction.reply({
     embeds: [message],
-    components: [embedButtons],
+    components: [messageButtons],
   });
 
-  const collectorFilter = (interaction: ButtonInteraction) =>
+  const collectorFilter = (interaction: ButtonInteraction<CacheType>) =>
     interaction.user.id === userId; // only the user who triggered the original interaction can use the buttons
 
   const collector = response.createMessageComponentCollector({
@@ -101,12 +106,12 @@ export const showLink: CommandExecute = async (interaction) => {
       getPageLinks(currentPageStart, currentPageEnd, guildLinks),
     );
 
-    setPreviousButtonDisabled(previousPageButton, currentPageStart);
-    setNextButtonDisabled(nextPageButton, currentPageEnd, guildLinks);
+    setPreviousButtonDisabledState(previousPageButton, currentPageStart);
+    setNextButtonDisabledState(nextPageButton, currentPageEnd, guildLinks);
 
     await _interaction.update({
       embeds: [message],
-      components: [embedButtons],
+      components: [messageButtons],
     });
   });
 };
@@ -124,7 +129,7 @@ const getIsNextButtonDisabled = (pageEnd: number, links: any[]) => {
   return pageEnd >= links.length;
 };
 
-const setNextButtonDisabled = (
+const setNextButtonDisabledState = (
   button: ButtonBuilder,
   pageEnd: number,
   links: any[],
@@ -136,7 +141,7 @@ const getIsPreviousButtonDisabled = (pageStart: number) => {
   return pageStart === 0;
 };
 
-const setPreviousButtonDisabled = (
+const setPreviousButtonDisabledState = (
   button: ButtonBuilder,
   pageStart: number,
 ) => {
