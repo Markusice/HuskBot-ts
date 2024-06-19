@@ -26,13 +26,19 @@ const displayButtonCustomID = (customID: ButtonCustomID): string => {
 };
 
 export const showLink: CommandExecute = async (interaction) => {
+  // interaction fields
   const guildId = interaction.guildId!;
   const userId = interaction.user.id!;
 
   const message = new EmbedBuilder();
 
+  // interaction options
   const pageNumber = interaction.options.getInteger("page");
+  const isGlobal = interaction.options.getBoolean("is_global");
+
+  // non-required options
   const isPageNumberGiven = pageNumber !== null;
+  const isGlobalGiven = isGlobal ?? false;
 
   const limitPerPage = 11;
   let currentPageStart = 0;
@@ -51,7 +57,9 @@ export const showLink: CommandExecute = async (interaction) => {
     });
 
     return;
-  } else if (isPageNumberGiven) {
+  }
+
+  if (isPageNumberGiven) {
     currentPageStart = pageNumber * limitPerPage - limitPerPage;
     currentPageEnd = currentPageStart + limitPerPage;
   }
@@ -80,15 +88,16 @@ export const showLink: CommandExecute = async (interaction) => {
 
   const response = await interaction.reply({
     embeds: [message],
+    ephemeral: !isGlobalGiven,
     components: [messageButtons],
   });
 
-  const collectorFilter = (interaction: ButtonInteraction<CacheType>) =>
+  const isUserTheCaller = (interaction: ButtonInteraction<CacheType>) =>
     interaction.user.id === userId; // only the user who triggered the original interaction can use the buttons
 
   const collector = response.createMessageComponentCollector({
     componentType: ComponentType.Button,
-    filter: collectorFilter,
+    filter: isGlobalGiven ? isUserTheCaller : undefined,
   });
 
   collector.on("collect", async (_interaction) => {
